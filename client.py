@@ -3,7 +3,7 @@
 import sys
 import zmq
 
-servername = "localhost"#"rscpm"
+servername = "localhost"#"zola"#"rscpm"
 serverport = "5555"
 connectionInfo = "tcp://"+servername+":"+serverport
 
