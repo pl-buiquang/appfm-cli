@@ -38,6 +38,10 @@ sock.connect(connectionInfo)
 def cli() :
   pass
 
+@cli.command()
+def reload() :
+  com.sendMessage(sock,"reload")
+
 @cli.group()
 def module() :
   pass
@@ -53,10 +57,20 @@ def run(module,conf_file):
   com.sendMessage(sock,"module run "+module+" "+conf_file)
 
 
-@cli.command()
-def test():
-  import uilib
-  print "yo"
+@cli.group()
+def process():
+  pass
+
+@process.command()
+def ls():
+  com.sendMessage(sock,"process ls")
+
+@process.command()
+@click.argument('pid')
+def status(pid):
+  com.sendMessage(sock,"process status "+pid)
+
+
 
 if __name__ == '__main__':
     cli()
