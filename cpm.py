@@ -41,21 +41,30 @@ def cli() :
 
 @cli.command()
 def reload() :
-  com.sendMessage(sock,"reload")
+  print com.sendMessage(sock,"reload")
 
 @cli.group()
 def module() :
   pass
 
+def modulesls(name):
+  return com.sendMessage(sock,"module ls"+name)
+
 @module.command()
-def ls():
-  com.sendMessage(sock,"module ls")
+@click.option('--name', default=False,is_flag=True)
+def ls(name):
+  optname = ""
+  if name :
+    optname = " --name"
+  print modulesls(optname)
+
+
 
 @module.command()
 @click.argument('module')
 @click.argument('conf_file')
 def run(module,conf_file):
-  com.sendMessage(sock,"module run "+module+" "+conf_file)
+  print com.sendMessage(sock,"module run "+module+" "+conf_file)
 
 
 @cli.group()
@@ -63,13 +72,17 @@ def process():
   pass
 
 @process.command()
-def ls():
-  com.sendMessage(sock,"process ls")
+@click.option('--all','-a', default=False,is_flag=True)
+def ls(all):
+  optall = ""
+  if all :
+    optall = " -a"
+  print com.sendMessage(sock,"process ls"+optall)
 
 @process.command()
 @click.argument('pid')
 def status(pid):
-  com.sendMessage(sock,"process status "+pid)
+  print com.sendMessage(sock,"process status "+pid)
 
 
 
