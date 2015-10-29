@@ -116,7 +116,7 @@ def status(pid):
 
 @process.command()
 @click.argument('pid')
-@click.argument('outputname',default="__ALL__")
+@click.argument('outputname')
 @click.option('--gui','-g',default=False,is_flag=True,help="View graphical result in a browser")
 def view(pid,outputname,gui):
   """View the output OUTPUTNAME of a module run PID"""
@@ -125,7 +125,7 @@ def view(pid,outputname,gui):
     optgui = " --gui"
   res = com.sendCommand(sock,"process view "+pid+" "+outputname+optgui)
   if gui :
-    webbrowser.open(guihost+res)
+    webbrowser.open(guihost+url)
   else :
     print res
 
