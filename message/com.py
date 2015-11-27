@@ -30,8 +30,8 @@ def sendMessage(sock,message,timeout=-1):
     msg = sock.recv()
   return msg
 
-def sendCommand(sock,command,timeout=-1):
-  cpmcommand = CPMCommand(command)
+def sendCommand(sock,command,data="",timeout=-1):
+  cpmcommand = CPMCommand(command,data)
   return sendMessage(sock,cpmcommand.toMessage(),timeout)
 
 
