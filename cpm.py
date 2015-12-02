@@ -10,7 +10,7 @@ import webbrowser
 from message import com
 
 
-servername = "localhost"#"rscpm"
+servername = "localhost"#"192.168.1.27"#"localhost"#"rscpm"
 serverport = "5555"
 connectionInfo = "tcp://"+servername+":"+serverport
 guihost = 'http://'+servername+':8080/'
@@ -37,16 +37,20 @@ def module() :
   pass
 
 def modulesls(name):
-  return com.sendCommand(sock,"module ls"+name,10)
+  return com.sendCommand(sock,"module ls"+name,timeout=10)
   
 def modulehelp(name):
-  return com.sendCommand(sock,"module getdesc "+name,10)
+  return com.sendCommand(sock,"module getdesc "+name,timeout=10)
 
 def modulefunc(name):
   @cli.command(help=modulehelp(name))
   @click.argument('conf_file')
   def func(conf_file):
-    print com.sendCommand(sock,"module run "+name+" "+conf_file)
+    file = open(conf_file)
+    confdata = ""
+    for line in file:
+      confdata += line
+    print com.sendCommand(sock,"module run "+name,data=confdata)
   return func
 
 
@@ -89,6 +93,10 @@ def run():
   """Run a MODULE with configuration file CONF_FILE"""
   pass
 
+
+@cli.command()
+def settings():
+	com.sendCommand(sock,"settings")
 
 @cli.group()
 def process():
