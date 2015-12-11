@@ -11,7 +11,7 @@ from message import com
 
 
 servername = "localhost"#"192.168.1.27"#"localhost"#"rscpm"
-serverport = "5555"
+serverport = "5556"
 connectionInfo = "tcp://"+servername+":"+serverport
 guihost = 'http://'+servername+':8080/'
 
