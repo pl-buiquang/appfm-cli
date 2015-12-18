@@ -1,5 +1,4 @@
 README
-cpm.py
 CPM_CLI.egg-info/PKG-INFO
 CPM_CLI.egg-info/SOURCES.txt
 CPM_CLI.egg-info/dependency_links.txt
