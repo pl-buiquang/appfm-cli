@@ -11,7 +11,7 @@ from message import com
 
 
 servername = "localhost"#"192.168.1.27"#"localhost"#"rscpm"
-serverport = "5556"
+serverport = "5555"
 connectionInfo = "tcp://"+servername+":"+serverport
 guihost = 'http://'+servername+':8080/'
 
@@ -115,6 +115,12 @@ def ls(all,recursive):
   if recursive :
     optrec = " -r"
   print com.sendCommand(sock,"process ls"+optall+optrec)
+
+@process.command()
+@click.argument('pid')
+def get(pid):
+  """ Print serialized information of a process """
+  print com.sendCommand(sock,"process get "+pid)
 
 @process.command()
 @click.argument('pid')
