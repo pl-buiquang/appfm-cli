@@ -32,6 +32,28 @@ def reload() :
   print com.sendCommand(sock,"reload")
 
 @cli.group()
+def corpus() :
+  pass
+
+@corpus.command()
+@click.option("--all","-a",default=False,is_flag=True,help="Print also results")
+@click.option("--json",default=False,is_flag=True,help="Print in json format")
+def ls(all,json):
+  optionall = ""
+  optionjson = ""
+  if all :
+    optionall = " --all"
+  if json :
+    optionjson = " --json"
+  print com.sendCommand(sock,"corpus ls"+optionall+optionjson)
+
+@corpus.command()
+@click.argument('filepath')
+@click.argument('offset')
+def lsdir(filepath,offset):
+  print com.sendCommand(sock,"corpus lsdir "+filepath+" "+offset)
+
+@cli.group()
 def module() :
   """Manage cpm modules"""
   pass
