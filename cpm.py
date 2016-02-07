@@ -31,6 +31,33 @@ def reload() :
   """Refresh cpm modules defintion"""
   print com.sendCommand(sock,"reload")
 
+@cli.command()
+def status() :
+  """Get information about cpm server status"""
+  print com.sendCommand(sock,"status",timeout = 10)
+
+@cli.group()
+def corpus() :
+  pass
+
+@corpus.command()
+@click.option("--all","-a",default=False,is_flag=True,help="Print also results")
+@click.option("--json",default=False,is_flag=True,help="Print in json format")
+def ls(all,json):
+  optionall = ""
+  optionjson = ""
+  if all :
+    optionall = " --all"
+  if json :
+    optionjson = " --json"
+  print com.sendCommand(sock,"corpus ls"+optionall+optionjson)
+
+@corpus.command()
+@click.argument('filepath')
+@click.argument('offset')
+def lsdir(filepath,offset):
+  print com.sendCommand(sock,"corpus lsdir "+filepath+" "+offset)
+
 @cli.group()
 def module() :
   """Manage cpm modules"""
@@ -44,17 +71,27 @@ def modulehelp(name):
 
 def modulefunc(name):
   @cli.command(help=modulehelp(name))
+  @click.option('--sync',default=False,is_flag=True,help="Run the module synchronously")
   @click.argument('conf_file')
-  def func(conf_file):
+  def func(conf_file,sync):
     file = open(conf_file)
     confdata = ""
     for line in file:
       confdata += line
-    print com.sendCommand(sock,"module run "+name,data=confdata)
+    synced = ""
+    if(sync):
+      synced = " --sync"
+    print com.sendCommand(sock,"module run "+name+synced,data=confdata)
   return func
 
 
-class CPMModules(click.MultiCommand):
+def moduleinfofunc(name):
+  @cli.command(help=modulehelp(name))
+  def func():
+    print com.sendCommand(sock,"module info "+name)
+  return func
+
+class CPMModulesRun(click.MultiCommand):
 
     def list_commands(self, ctx):
         rv = []
@@ -68,10 +105,22 @@ class CPMModules(click.MultiCommand):
     def get_command(self, ctx, name):
         return modulefunc(name)
 
+class CPMModulesInfo(click.MultiCommand):
+
+    def list_commands(self, ctx):
+        rv = []
+        modules = modulesls(" --name")
+        for filename in modules.split("\n"):
+            if filename.strip() != "":
+                rv.append(filename)
+        rv.sort()
+        return rv
+
+    def get_command(self, ctx, name):
+        return moduleinfofunc(name)
 
 
-
-@cli.command(cls=CPMModules)
+@cli.command(cls=CPMModulesRun)
 def run():
   """Shorthand for "module run" command"""
   pass
@@ -80,15 +129,19 @@ def run():
 @module.command()
 @click.option('--name', default=False,is_flag=True,help="Only print modules' name")
 def ls(name):
-  """List all available modules"""
+  """List all available modules""" 
   optname = ""
   if name :
     optname = " --name"
   print modulesls(optname)
 
 
+@module.command(cls=CPMModulesInfo)
+def info():
+  """Get information about a module""" 
+  pass
 
-@module.command(cls=CPMModules)
+@module.command(cls=CPMModulesRun)
 def run():
   """Run a MODULE with configuration file CONF_FILE"""
   pass
@@ -150,6 +203,9 @@ def log(pid,gui):
   """View the default error log of a module run PID"""
   res = com.sendCommand(sock,"process log "+pid)
   print res
+
+
+
 
 
 if __name__ == '__main__':

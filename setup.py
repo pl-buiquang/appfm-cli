@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='CPM CLI',
@@ -7,6 +7,7 @@ setup(
     install_requires=[
         'Click',
     ],
+    packages=find_packages(),
     entry_points='''
         [console_scripts]
         cpm=cpm:cli
