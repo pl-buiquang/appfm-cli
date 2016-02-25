@@ -67,20 +67,44 @@ def modulesls(name):
   return com.sendCommand(sock,"module ls"+name,timeout=10)
   
 def modulehelp(name):
-  return com.sendCommand(sock,"module getdesc "+name,timeout=10)
+  return com.sendCommand(sock,"module getdesc "+name+" --extended",timeout=10)
 
 def modulefunc(name):
   @cli.command(help=modulehelp(name))
   @click.option('--sync',default=False,is_flag=True,help="Run the module synchronously")
-  @click.argument('conf_file')
-  def func(conf_file,sync):
-    file = open(conf_file)
+  @click.option('--config','-c',type=click.File('rb'),default=None,help="Yaml environment input configuration file")
+  @click.option('--arg',multiple=True,help="Input (overrides configuration file if given) of the form INPUTNAME:VALUE (yaml field format)")
+  def func(arg,config,sync):
     confdata = ""
-    for line in file:
-      confdata += line
+    args = {}
+    if config :
+      for line in config:
+        if line.strip() != "":
+          var = line.split(":")
+          if len(var) < 2:
+            print "Wrong input paramater format : "+line
+            return
+          paramater = var[0].strip()
+          if paramater in args:
+            print "warning multiple input values for paramater "+paramater
+          args[paramater] = ":".join(var[1:]).strip()
+
+    for item in arg :
+      var = item.split(":")
+      if len(var) < 2:
+        print "Wrong input paramater format : "+item
+        return
+      paramater = var[0].strip()
+      if paramater in args:
+        print "warning multiple input values for paramater "+paramater
+      args[paramater] = ":".join(var[1:]).strip()
+
+    for paramater in args:
+      confdata += paramater+" : "+args[paramater]+"\n"
     synced = ""
     if(sync):
       synced = " --sync"
+
     print com.sendCommand(sock,"module run "+name+synced,data=confdata)
   return func
 
@@ -149,7 +173,7 @@ def run():
 
 @cli.command()
 def settings():
-	com.sendCommand(sock,"settings")
+	print com.sendCommand(sock,"settings")
 
 @cli.group()
 def process():
@@ -205,7 +229,15 @@ def log(pid,gui):
   print res
 
 
+@cli.group()
+def fs():
+  pass
 
+@fs.command()
+@click.argument('file')
+def get(file):
+  """Retrieve file content"""
+  print com.sendCommand(sock,"fs get "+file)
 
 
 if __name__ == '__main__':

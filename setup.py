@@ -6,6 +6,7 @@ setup(
     py_modules=['cpm'],
     install_requires=[
         'Click',
+        'pyzmq'
     ],
     packages=find_packages(),
     entry_points='''
