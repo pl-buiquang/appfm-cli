@@ -4,7 +4,12 @@ This python script/package allow command line interaction with AppFM. Documentat
 Just type (after proper installation) : cpm --help
 More information is provided in the wiki (within the web interface of an existing installation)
 
-== Installation
+== Quick install
+
+Be sure that the current working directory is the one containing this file then execute :
+sh ./install.sh
+
+== Manual Installation
 
 === Install python module
 [code]pip install .[/code]

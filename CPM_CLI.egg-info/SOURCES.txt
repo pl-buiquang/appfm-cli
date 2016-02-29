@@ -1,7 +1,9 @@
-README
+cpm.py
 CPM_CLI.egg-info/PKG-INFO
 CPM_CLI.egg-info/SOURCES.txt
 CPM_CLI.egg-info/dependency_links.txt
 CPM_CLI.egg-info/entry_points.txt
 CPM_CLI.egg-info/requires.txt
 CPM_CLI.egg-info/top_level.txt
+message/__init__.py
+message/com.py
