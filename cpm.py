@@ -38,6 +38,7 @@ def status() :
 
 @cli.group()
 def corpus() :
+  """Depreciated functions (use fs)"""
   pass
 
 @corpus.command()
@@ -173,7 +174,9 @@ def run():
 
 @cli.command()
 def settings():
-	print com.sendCommand(sock,"settings")
+  """Retrieve appfm settings"""
+  print com.sendCommand(sock,"settings")
+
 
 @cli.group()
 def process():
@@ -231,6 +234,7 @@ def log(pid,gui):
 
 @cli.group()
 def fs():
+  """Access functions to filesystem (retrieve file, list directories)"""
   pass
 
 @fs.command()
@@ -239,6 +243,16 @@ def get(file):
   """Retrieve file content"""
   print com.sendCommand(sock,"fs get "+file)
 
+@fs.command()
+@click.argument('directory')
+def ls(directory):
+  """List directory content"""
+  import json
+  jsonobj = json.loads(com.sendCommand(sock,"fs ls "+directory+" 0"))
+  while "..." in jsonobj[len(jsonobj)-1] :
+    jsonobj = jsonobj[:-1]
+    jsonobj += json.loads(com.sendCommand(sock,"fs ls "+directory+" "+str(len(jsonobj))))
+  print json.dumps(jsonobj)
 
 if __name__ == '__main__':
   cli()
