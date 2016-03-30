@@ -32,6 +32,11 @@ def reload() :
   print com.sendCommand(sock,"reload")
 
 @cli.command()
+def test() :
+  """Test command for dev debug purpose"""
+  print com.sendCommand(sock,"test")
+
+@cli.command()
 def status() :
   """Get information about cpm server status"""
   print com.sendCommand(sock,"status",timeout = 10)
