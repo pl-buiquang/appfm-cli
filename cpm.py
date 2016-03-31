@@ -10,10 +10,42 @@ import webbrowser
 from message import com
 
 
-servername = "localhost"#"192.168.1.27"#"localhost"#"rscpm"
-serverport = "5555"
-connectionInfo = "tcp://"+servername+":"+serverport
-guihost = 'http://'+servername+':8080/'
+def initConf() :
+	defaultservername = "localhost"#"192.168.1.27"#"localhost"#"rscpm"
+	defaultserverport = "5555"
+	conffile = os.environ["HOME"]+"/.config/cpm.conf"
+	conf = {
+		"host":defaultservername,
+		"port":defaultserverport
+	}
+	errormessage = "Using default value for connection : "+defaultservername+":"+defaultserverport
+	if os.path.exists(conffile) :
+		f = open(conffile,"r")
+		try :
+			for l in f:
+				l = l.strip()
+				if l.startswith("#") or l == "":
+					continue
+				else :
+					variable = l.split(":")
+  				conf[variable[0].strip()] = variable[1].strip()				
+		except :
+			conf = {
+				"host":defaultservername,
+				"port":defaultserverport
+			}
+			print "Unexpected error while reading configuration :", sys.exc_info()[0] 
+	else :
+		print "Couldn't find configuration file!"
+		print errormessage
+	return conf
+
+
+conf=initConf()
+connectionInfo = "tcp://"+conf["host"]+":"+conf["port"]
+
+
+
 
 context = zmq.Context()
 

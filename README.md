@@ -4,10 +4,15 @@ This python script/package allow command line interaction with AppFM. Documentat
 Just type (after proper installation) : cpm --help
 More information is provided in the wiki (within the web interface of an existing installation)
 
+== Dependencies
+
+This python module requires python-dev and python-pip to be installed on the system. If this is not the case, you can install them by typing :
+sudo apt-get install python-dev python-pip
+
 == Quick install
 
 Be sure that the current working directory is the one containing this file then execute :
-sh ./install.sh
+./install.sh
 
 == Manual Installation
 
