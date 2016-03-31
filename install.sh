@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-APPHOME=`dirname $0`
+APPHOME=$(cd `dirname $0` && pwd)
 
 
 if [ -z `which pip` ] ; then
