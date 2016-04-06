@@ -46,7 +46,6 @@ connectionInfo = "tcp://"+conf["host"]+":"+conf["port"]
 
 
 
-
 context = zmq.Context()
 
 sock = context.socket(zmq.REQ)
