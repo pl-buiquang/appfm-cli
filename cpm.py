@@ -189,12 +189,16 @@ def run():
 
 @module.command()
 @click.option('--name', default=False,is_flag=True,help="Only print modules' name")
-def ls(name):
+@click.option('--json', default=False,is_flag=True,help="JSON Format")
+def ls(name,json):
   """List all available modules""" 
   optname = ""
+  jsonopt = ""
   if name :
     optname = " --name"
-  print modulesls(optname)
+  if json :
+    jsonopt = " --json"
+  print modulesls(optname+jsonopt)
 
 
 @module.command(cls=CPMModulesInfo)
