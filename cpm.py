@@ -240,7 +240,9 @@ def settings():
   print com.sendCommand(sock,"settings")
 
 
-
+@process.command()
+def queue():
+  print com.sendCommand(sock,"process queue")
 
 @process.command()
 @click.option('--all','-a', default=False,is_flag=True,help="List all processes (including stopped/finished processes)")
