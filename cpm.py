@@ -3,6 +3,7 @@
 import sys
 import zmq
 import os
+import re
 
 import click
 import webbrowser
@@ -57,6 +58,11 @@ def cli() :
   """CPM CLI - Corpus & Process Manager Command Line Interface"""
   pass
 
+@cli.group()
+def process():
+  """Manage cpm process"""
+  pass
+
 @cli.command()
 def reload() :
   """Refresh cpm modules defintion"""
@@ -107,6 +113,9 @@ def module() :
 
 def modulesls(name):
   return com.sendCommand(sock,"module ls"+name,timeout=10)
+
+def processls(allp):
+  return com.sendCommand(sock,"process ls "+allp,timeout=10)
   
 def modulehelp(name):
   return com.sendCommand(sock,"module getdesc "+name+" --extended",timeout=10)
@@ -157,6 +166,13 @@ def moduleinfofunc(name):
     print com.sendCommand(sock,"module info "+name)
   return func
 
+
+
+
+
+
+
+
 class CPMModulesRun(click.MultiCommand):
 
     def list_commands(self, ctx):
@@ -190,6 +206,7 @@ class CPMModulesInfo(click.MultiCommand):
 def run():
   """Shorthand for "module run" command"""
   pass
+
   
 
 @module.command()
@@ -223,58 +240,98 @@ def settings():
   print com.sendCommand(sock,"settings")
 
 
-@cli.group()
-def process():
-  """Manage cpm process"""
-  pass
+
 
 @process.command()
 @click.option('--all','-a', default=False,is_flag=True,help="List all processes (including stopped/finished processes)")
-@click.option('--recursive','-r', default=False,is_flag=True,help="List also children processes")
-def ls(all,recursive):
+#@click.option('--recursive','-r', default=False,is_flag=True,help="List also children processes")
+@click.option('--head','-h', default=False,is_flag=True,help="List only latest owned")
+@click.option('--user','-u', default=False,is_flag=True,help="List only owned processes")
+def ls(all,head,user):
   """List running processes"""
   optall = ""
   optrec = ""
+  optowned = ""
   if all :
     optall = " -a"
-  if recursive :
-    optrec = " -r"
-  print com.sendCommand(sock,"process ls"+optall+optrec)
+  if head :
+    optrec = " -h"
+  if user :
+    optowned = " -u"
+  print com.sendCommand(sock,"process ls"+optall+optrec+optowned)
 
-@process.command()
-@click.argument('pid')
-def get(pid):
+
+class CPMProcessActions(click.MultiCommand):
+    def list_commands(self, ctx):
+        rv = []
+        runs = processls("-a -h")
+        for run in runs.split("\n"):
+            m = re.search(".*?:\s*([a-zA-Z0-9_\-]+)",run)
+            if m:
+                rv.append(m.group(1))
+        #rv.sort()
+        return rv
+
+
+class CPMProcessView(CPMProcessActions):
+  def get_command(self,ctx,name):
+    @cli.command()
+    @click.argument('outputname',default="__ALL__")
+    def processtestview(outputname):
+      print com.sendCommand(sock,"process view "+name+" "+outputname)
+    return processtestview
+
+@process.command(cls=CPMProcessView)
+def view():
+  pass
+
+class CPMProcessGet(CPMProcessActions):
+  def get_command(self,ctx,pid):
+    @cli.command()
+    def func():
+      print com.sendCommand(sock,"process get "+pid)
+    return func
+
+@process.command(cls=CPMProcessGet)
+def get():
   """ Print serialized information of a process """
-  print com.sendCommand(sock,"process get "+pid)
+  pass
 
-@process.command()
-@click.argument('pid')
-def status(pid):
+class CPMProcessStatus(CPMProcessActions):
+  def get_command(self,ctx,pid):
+    @cli.command()
+    def func():
+      print com.sendCommand(sock,"process status "+pid)
+    return func
+
+@process.command(cls=CPMProcessStatus)
+def status():
   """Print the status of a process and its children processes if any"""
-  print com.sendCommand(sock,"process status "+pid)
+  pass
 
-@process.command()
-@click.argument('pid')
-@click.argument('outputname',default="__ALL__")
-@click.option('--gui','-g',default=False,is_flag=True,help="View graphical result in a browser")
-def view(pid,outputname,gui):
-  """View the output OUTPUTNAME of a module run PID"""
-  optgui = ""
-  if gui :
-    optgui = " --gui"
-  res = com.sendCommand(sock,"process view "+pid+" "+outputname+optgui)
-  if gui :
-    webbrowser.open(guihost+res)
-  else :
-    print res
+class CPMProcessLog(CPMProcessActions):
+  def get_command(self,ctx,pid):
+    @cli.command()
+    def func():
+      print com.sendCommand(sock,"process log "+pid)
+    return func
 
-@process.command()
-@click.argument('pid')
-@click.option('--gui','-g',default=False,is_flag=True)
-def log(pid,gui):
+@process.command(cls=CPMProcessLog)
+def log():
   """View the default error log of a module run PID"""
-  res = com.sendCommand(sock,"process log "+pid)
-  print res
+  pass
+
+class CPMProcessDel(CPMProcessActions):
+  def get_command(self,ctx,pid):
+    @cli.command()
+    def func():
+      print com.sendCommand(sock,"process del "+pid)
+    return func
+
+@process.command(cls=CPMProcessDel)
+def delete():
+  """View the default error log of a module run PID"""
+  pass
 
 
 @cli.group()

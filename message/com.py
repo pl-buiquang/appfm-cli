@@ -1,11 +1,15 @@
 import zmq
 import sys
+import socket
+import os
 
 class CPMCommand :
 
   def __init__(self,command,data="",user="",password=""):
     self.command = command
     self.data = data
+    if user == "":
+      user = os.environ['USER'] +'@'+ socket.gethostname()
     self.user = user
     self.password = password
 
