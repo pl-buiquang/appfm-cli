@@ -335,6 +335,18 @@ def delete():
   """View the default error log of a module run PID"""
   pass
 
+class CPMProcessKill(CPMProcessActions):
+  def get_command(self,ctx,pid):
+    @cli.command()
+    def func():
+      print com.sendCommand(sock,"process kill "+pid)
+    return func
+
+@process.command(cls=CPMProcessKill)
+def kill():
+  """View the default error log of a module run PID"""
+  pass
+
 
 @cli.group()
 def fs():
